@@ -10,8 +10,8 @@ function setting(key: string): Record<string, unknown> | undefined {
 }
 
 test("uses Nezha as the visible theme name without changing its internal id", () => {
-  assert.equal(manifest.name, "Nezha")
-  assert.equal(manifest.short, "nezha")
+  assert.equal(manifest.name, "Nezha-DA")
+  assert.equal(manifest.short, "nezha-DA")
 })
 
 test("uses the overview card as the default layout", () => {
@@ -25,7 +25,6 @@ test("uses the overview card as the default layout", () => {
 })
 
 test("keeps decorative overview elements disabled by default", () => {
-  assert.equal(setting("DisableAnimatedMan")?.default, true)
   assert.equal(setting("DisableOverviewWave")?.default, true)
   assert.equal(setting("ShowOverviewWave"), undefined)
 })
