@@ -1,11 +1,11 @@
 {
-    "name": "Nezha",
-    "short": "nezha",
+    "name": "Nezha-DA",
+    "short": "nezha-DA",
     "description": "Nezha Theme for Komari Monitor",
-    "version": "3.1.4",
-    "author": "Nomi",
-    "url": "https://github.com/nuomiiiii/nezha",
-    "upstream": "https://github.com/BITJEBE/nezha-BITJEBE",
+    "version": "3.2.0",
+    "author": "DemoAlbum",
+    "url": "https://github.com/DemoAlbum/nezha",
+    "upstream": "https://github.com/nuomiiiii/nezha",
     "preview": "preview-ae4b40a5.png",
     "navigation": {
         "server_detail": "/server/{uuid}",
@@ -39,13 +39,6 @@
                 "type": "input",
                 "default": "/favicon.ico",
                 "help": "站点Logo图片URL，留空时左上角跟随 Komari 后台设置的站点图标；填写其他图片地址可单独设置。加载失败时回退到 Komari 站点图标。"
-            },
-            {
-                "key": "CustomIllustration",
-                "name": "自定义插图",
-                "type": "input",
-                "default": "",
-                "help": "首页右侧的自定义插图URL，留空使用默认插图。"
             },
             {
                 "key": "ForceTheme",
@@ -93,13 +86,6 @@
                 "type": "input",
                 "default": "",
                 "help": "自定义首页分组顺序，All 固定最前。支持逗号/换行分隔或 JSON 数组，例如 香港,日本,美国。未列出的分组会按名称排在后面。"
-            },
-            {
-                "key": "DisableAnimatedMan",
-                "name": "禁用动画插图",
-                "type": "switch",
-                "default": true,
-                "help": "开启后隐藏首页的动画人物插图。默认已开启（隐藏）。"
             },
             {
                 "key": "DisableOverviewWave",
