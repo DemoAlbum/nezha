@@ -2,14 +2,17 @@ import { Card, CardContent } from "@/components/ui/card"
 import { ChartConfig, ChartContainer } from "@/components/ui/chart"
 import { useWebSocketContext } from "@/hooks/use-websocket-context"
 import { formatBytes } from "@/lib/format"
-import { cn, formatNezhaInfo, formatRelativeTime } from "@/lib/utils"
+import { fetchResourceMetrics, ResourcePoint } from "@/lib/nezha-api"
+import { cn, formatNezhaInfo, formatRelativeTime, formatTime } from "@/lib/utils"
 import { NezhaServer, NezhaWebsocketResponse } from "@/types/nezha-api"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { Area, AreaChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
 import { ServerDetailChartLoading } from "./loading/ServerDetailLoading"
 import AnimatedCircularProgressBar from "./ui/animated-circular-progress-bar"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 
 type cpuChartData = {
   timeStamp: string
@@ -44,8 +47,28 @@ type connectChartData = {
   udp: number
 }
 
+const TIME_OPTIONS = [
+  { value: "0", label: "实时" },
+  { value: "1", label: "1h" },
+  { value: "6", label: "6h" },
+  { value: "12", label: "12h" },
+  { value: "24", label: "24h" },
+  { value: "72", label: "3d" },
+  { value: "168", label: "7d" },
+  { value: "720", label: "30d" },
+]
+
 export default function ServerDetailChart({ server_id }: { server_id: number }) {
   const { lastMessage, connected, messageHistory } = useWebSocketContext()
+  const [hours, setHours] = useState(0)
+
+  const { data: resourceHistory } = useQuery({
+    queryKey: ["resourceMetrics", server_id, hours],
+    queryFn: () => fetchResourceMetrics(server_id, hours),
+    enabled: hours > 0,
+    placeholderData: keepPreviousData,
+    refetchInterval: hours > 0 ? (hours <= 24 ? 10000 : 60000) : false,
+  })
 
   if (!connected && !lastMessage) {
     return <ServerDetailChartLoading />
@@ -63,19 +86,65 @@ export default function ServerDetailChart({ server_id }: { server_id: number }) 
     return <ServerDetailChartLoading />
   }
 
+  const h = hours > 0 ? resourceHistory : undefined
+
   return (
-    <section className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-3 server-charts">
-      <CpuChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-      <ProcessChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-      <DiskChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-      <MemChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-      <NetworkChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-      <ConnectChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} />
-    </section>
+    <>
+      <div className="flex justify-end mb-2">
+        <Select value={hours.toString()} onValueChange={(v) => setHours(Number(v))}>
+          <SelectTrigger className="h-7 w-[90px] text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {TIME_OPTIONS.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value} className="text-xs">
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-3 server-charts">
+        <CpuChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} historyData={h?.["cpu.usage"]} />
+        <ProcessChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} historyData={h?.["process.count"]} />
+        <DiskChart now={nezhaWsData.now} data={server} messageHistory={messageHistory} historyData={h?.["disk.used"]} />
+        <MemChart
+          now={nezhaWsData.now}
+          data={server}
+          messageHistory={messageHistory}
+          historyMem={h?.["memory.used"]}
+          historySwap={h?.["swap.used"]}
+        />
+        <NetworkChart
+          now={nezhaWsData.now}
+          data={server}
+          messageHistory={messageHistory}
+          historyUp={h?.["net.out.rate"]}
+          historyDown={h?.["net.in.rate"]}
+        />
+        <ConnectChart
+          now={nezhaWsData.now}
+          data={server}
+          messageHistory={messageHistory}
+          historyTcp={h?.["connections.tcp"]}
+          historyUdp={h?.["connections.udp"]}
+        />
+      </section>
+    </>
   )
 }
 
-function CpuChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function CpuChart({
+  now,
+  data,
+  messageHistory,
+  historyData,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyData?: ResourcePoint[]
+}) {
   const [cpuChartData, setCpuChartData] = useState<cpuChartData[]>([])
   const hasInitialized = useRef(false)
   const [historyLoaded, setHistoryLoaded] = useState(false)
@@ -135,6 +204,8 @@ function CpuChart({ now, data, messageHistory }: { now: number; data: NezhaServe
     },
   } satisfies ChartConfig
 
+  const chartData = historyData ? historyData.map((p) => ({ timeStamp: p.created_at.toString(), cpu: p.value })) : cpuChartData
+
   return (
     <Card
       className={cn({
@@ -153,7 +224,7 @@ function CpuChart({ now, data, messageHistory }: { now: number; data: NezhaServe
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <AreaChart
               accessibilityLayer
-              data={cpuChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -168,7 +239,7 @@ function CpuChart({ now, data, messageHistory }: { now: number; data: NezhaServe
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
               <Area isAnimationActive={false} dataKey="cpu" type="step" fill="hsl(var(--chart-1))" fillOpacity={0.3} stroke="hsl(var(--chart-1))" />
@@ -180,7 +251,17 @@ function CpuChart({ now, data, messageHistory }: { now: number; data: NezhaServe
   )
 }
 
-function ProcessChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function ProcessChart({
+  now,
+  data,
+  messageHistory,
+  historyData,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyData?: ResourcePoint[]
+}) {
   const { t } = useTranslation()
   const [processChartData, setProcessChartData] = useState([] as processChartData[])
   const hasInitialized = useRef(false)
@@ -241,6 +322,8 @@ function ProcessChart({ now, data, messageHistory }: { now: number; data: NezhaS
     },
   } satisfies ChartConfig
 
+  const chartData = historyData ? historyData.map((p) => ({ timeStamp: p.created_at.toString(), process: p.value })) : processChartData
+
   return (
     <Card
       className={cn({
@@ -258,7 +341,7 @@ function ProcessChart({ now, data, messageHistory }: { now: number; data: NezhaS
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <AreaChart
               accessibilityLayer
-              data={processChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -273,7 +356,7 @@ function ProcessChart({ now, data, messageHistory }: { now: number; data: NezhaS
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} />
               <Area
@@ -292,7 +375,19 @@ function ProcessChart({ now, data, messageHistory }: { now: number; data: NezhaS
   )
 }
 
-function MemChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function MemChart({
+  now,
+  data,
+  messageHistory,
+  historyMem,
+  historySwap,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyMem?: ResourcePoint[]
+  historySwap?: ResourcePoint[]
+}) {
   const { t } = useTranslation()
   const [memChartData, setMemChartData] = useState([] as memChartData[])
   const hasInitialized = useRef(false)
@@ -357,6 +452,15 @@ function MemChart({ now, data, messageHistory }: { now: number; data: NezhaServe
     },
   } satisfies ChartConfig
 
+  const chartData =
+    historyMem && historySwap
+      ? historyMem.map((p, i) => ({
+          timeStamp: p.created_at.toString(),
+          mem: data.host.mem_total ? (p.value / data.host.mem_total) * 100 : 0,
+          swap: data.host.swap_total && historySwap[i] ? (historySwap[i].value / data.host.swap_total) * 100 : 0,
+        }))
+      : memChartData
+
   return (
     <Card
       className={cn({
@@ -400,7 +504,7 @@ function MemChart({ now, data, messageHistory }: { now: number; data: NezhaServe
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <AreaChart
               accessibilityLayer
-              data={memChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -415,7 +519,7 @@ function MemChart({ now, data, messageHistory }: { now: number; data: NezhaServe
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyMem ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
               <Area isAnimationActive={false} dataKey="mem" type="step" fill="hsl(var(--chart-8))" fillOpacity={0.3} stroke="hsl(var(--chart-8))" />
@@ -435,7 +539,17 @@ function MemChart({ now, data, messageHistory }: { now: number; data: NezhaServe
   )
 }
 
-function DiskChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function DiskChart({
+  now,
+  data,
+  messageHistory,
+  historyData,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyData?: ResourcePoint[]
+}) {
   const { t } = useTranslation()
   const [diskChartData, setDiskChartData] = useState([] as diskChartData[])
   const hasInitialized = useRef(false)
@@ -496,6 +610,13 @@ function DiskChart({ now, data, messageHistory }: { now: number; data: NezhaServ
     },
   } satisfies ChartConfig
 
+  const chartData = historyData
+    ? historyData.map((p) => ({
+        timeStamp: p.created_at.toString(),
+        disk: data.host.disk_total ? (p.value / data.host.disk_total) * 100 : 0,
+      }))
+    : diskChartData
+
   return (
     <Card
       className={cn({
@@ -519,7 +640,7 @@ function DiskChart({ now, data, messageHistory }: { now: number; data: NezhaServ
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <AreaChart
               accessibilityLayer
-              data={diskChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -534,7 +655,7 @@ function DiskChart({ now, data, messageHistory }: { now: number; data: NezhaServ
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
               <Area isAnimationActive={false} dataKey="disk" type="step" fill="hsl(var(--chart-5))" fillOpacity={0.3} stroke="hsl(var(--chart-5))" />
@@ -546,7 +667,19 @@ function DiskChart({ now, data, messageHistory }: { now: number; data: NezhaServ
   )
 }
 
-function NetworkChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function NetworkChart({
+  now,
+  data,
+  messageHistory,
+  historyUp,
+  historyDown,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyUp?: ResourcePoint[]
+  historyDown?: ResourcePoint[]
+}) {
   const { t } = useTranslation()
   const [networkChartData, setNetworkChartData] = useState([] as networkChartData[])
   const hasInitialized = useRef(false)
@@ -602,7 +735,16 @@ function NetworkChart({ now, data, messageHistory }: { now: number; data: NezhaS
     }
   }, [data, historyLoaded])
 
-  let maxDownload = Math.max(...networkChartData.map((item) => item.download))
+  const chartData =
+    historyUp && historyDown
+      ? historyUp.map((p, i) => ({
+          timeStamp: p.created_at.toString(),
+          upload: p.value / 1024 / 1024,
+          download: historyDown[i] ? historyDown[i].value / 1024 / 1024 : 0,
+        }))
+      : networkChartData
+
+  let maxDownload = Math.max(...chartData.map((item) => item.download))
   maxDownload = Math.ceil(maxDownload)
   if (maxDownload < 1) {
     maxDownload = 1
@@ -650,7 +792,7 @@ function NetworkChart({ now, data, messageHistory }: { now: number; data: NezhaS
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <LineChart
               accessibilityLayer
-              data={networkChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -665,7 +807,7 @@ function NetworkChart({ now, data, messageHistory }: { now: number; data: NezhaS
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyUp ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis
                 tickLine={false}
@@ -688,7 +830,19 @@ function NetworkChart({ now, data, messageHistory }: { now: number; data: NezhaS
   )
 }
 
-function ConnectChart({ now, data, messageHistory }: { now: number; data: NezhaServer; messageHistory: { data: string }[] }) {
+function ConnectChart({
+  now,
+  data,
+  messageHistory,
+  historyTcp,
+  historyUdp,
+}: {
+  now: number
+  data: NezhaServer
+  messageHistory: { data: string }[]
+  historyTcp?: ResourcePoint[]
+  historyUdp?: ResourcePoint[]
+}) {
   const [connectChartData, setConnectChartData] = useState([] as connectChartData[])
   const hasInitialized = useRef(false)
   const [historyLoaded, setHistoryLoaded] = useState(false)
@@ -752,6 +906,15 @@ function ConnectChart({ now, data, messageHistory }: { now: number; data: NezhaS
     },
   } satisfies ChartConfig
 
+  const chartData =
+    historyTcp && historyUdp
+      ? historyTcp.map((p, i) => ({
+          timeStamp: p.created_at.toString(),
+          tcp: p.value,
+          udp: historyUdp[i] ? historyUdp[i].value : 0,
+        }))
+      : connectChartData
+
   return (
     <Card
       className={cn({
@@ -781,7 +944,7 @@ function ConnectChart({ now, data, messageHistory }: { now: number; data: NezhaS
           <ChartContainer config={chartConfig} className="aspect-auto h-[130px] w-full">
             <LineChart
               accessibilityLayer
-              data={connectChartData}
+              data={chartData}
               margin={{
                 top: 12,
                 left: 12,
@@ -796,7 +959,7 @@ function ConnectChart({ now, data, messageHistory }: { now: number; data: NezhaS
                 tickMargin={8}
                 minTickGap={200}
                 interval="preserveStartEnd"
-                tickFormatter={(value) => formatRelativeTime(value)}
+                tickFormatter={(value) => (historyTcp ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} type="number" interval="preserveStartEnd" />
               <Line isAnimationActive={false} dataKey="tcp" type="linear" stroke="hsl(var(--chart-1))" strokeWidth={1} dot={false} />
