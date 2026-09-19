@@ -153,6 +153,58 @@ async function fetchPingMetricSeries(
   }
 }
 
+const RESOURCE_METRIC_KEYS = {
+  cpu: "cpu.usage",
+  memUsed: "memory.used",
+  diskUsed: "disk.used",
+  swapUsed: "swap.used",
+  netInRate: "net.in.rate",
+  netOutRate: "net.out.rate",
+  process: "process.count",
+  tcp: "connections.tcp",
+  udp: "connections.udp",
+} as const
+
+export type ResourcePoint = { created_at: number; value: number }
+export type ResourceSeries = Record<string, ResourcePoint[]>
+
+export const fetchResourceMetrics = async (server_id: number, hours: number): Promise<ResourceSeries> => {
+  const km_nodes: Record<string, any> = await getKomariNodes()
+  if (km_nodes?.error) {
+    throw new Error(km_nodes.error)
+  }
+  const uuid = Object.keys(km_nodes).find((id) => uuidToNumber(id) === server_id)
+  if (!uuid) return {}
+
+  const client = SharedClient()
+  const maxPoints = hours <= 24 ? 1440 : hours <= 168 ? 2000 : 2880
+
+  const result = await client.callViaHTTP<Record<string, unknown>, KomariMetricResponse>(
+    "public:queryMetrics",
+    {
+      entity_id: uuid,
+      metric_keys: Object.values(RESOURCE_METRIC_KEYS),
+      hours,
+      downsample: true,
+      max_points: maxPoints,
+      aggregation: "avg",
+      fill_empty: false,
+    },
+    { timeout: 30000 },
+  )
+
+  const out: ResourceSeries = {}
+  for (const series of result?.series || []) {
+    if (!series.metric_key) continue
+    const points = (series.points || [])
+      .map((p) => ({ created_at: metricPointTime(p) ?? 0, value: Number(p.value) }))
+      .filter((p) => p.created_at > 0 && Number.isFinite(p.value))
+      .sort((a, b) => a.created_at - b.created_at)
+    if (points.length) out[series.metric_key] = points
+  }
+  return out
+}
+
 function monitorDataFromMetricSeries(
   seriesList: KomariMetricSeries[],
   tasks: KomariPingTask[],
