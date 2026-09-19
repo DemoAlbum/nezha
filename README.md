@@ -1,10 +1,10 @@
 # Nezha
 
-[![Release](https://img.shields.io/github/v/release/nuomiiiii/nezha?label=release)](https://github.com/nuomiiiii/nezha/releases)
+[![Release](https://img.shields.io/github/v/release/DemoAlbum/nezha?label=release)](https://github.com/DemoAlbum/nezha/releases)
 [![Komari Theme](https://img.shields.io/badge/Komari-Theme-6366F1)](https://github.com/komari-monitor/theme-market)
-[![License](https://img.shields.io/github/license/nuomiiiii/nezha)](LICENSE)
+[![License](https://img.shields.io/github/license/DemoAlbum/nezha)](LICENSE)
 
-面向 [Komari Monitor](https://github.com/nuomiiiii/komari) 的信息密集型大屏主题，基于 [BITJEBE/nezha-BITJEBE](https://github.com/BITJEBE/nezha-BITJEBE) 二次开发。它将服务器状态、资源占用、网络质量、流量与账单信息集中到一套适合桌面和移动端使用的界面中。
+面向 [Komari Monitor](https://github.com/DemoAlbum/komari) 的信息密集型大屏主题，基于 [BITJEBE/nezha-BITJEBE](https://github.com/BITJEBE/nezha-BITJEBE) 二次开发。它将服务器状态、资源占用、网络质量、流量与账单信息集中到一套适合桌面和移动端使用的界面中。
 
 ![Nezha 主题预览](preview.png)
 
@@ -62,7 +62,7 @@
 
 ### 手动安装
 
-1. 从 [Releases](https://github.com/nuomiiiii/nezha/releases) 下载最新的 `nezha-v*.zip`。
+1. 从 [Releases](https://github.com/DemoAlbum/nezha/releases) 下载最新的 `nezha-v*.zip`。
 2. 进入 Komari 后台的“主题管理”。
 3. 上传 ZIP；已安装旧版本时可以直接覆盖更新。
 
@@ -98,7 +98,7 @@ So-net<red>;1Gbps<green>;CN2 GIA<blue>;<JPY>
 ## 从源码构建
 
 ```bash
-git clone https://github.com/nuomiiiii/nezha.git
+git clone https://github.com/DemoAlbum/nezha.git
 cd nezha
 npm install
 npm run build
@@ -109,14 +109,12 @@ npm run build
 ## 文档与反馈
 
 - [完整更新日志](CHANGELOG.md)
-- [版本发布与安装包](https://github.com/nuomiiiii/nezha/releases)
-- [Komari Monitor](https://github.com/nuomiiiii/komari)
+- [版本发布与安装包](https://github.com/DemoAlbum/nezha/releases)
 
 ## 致谢
 
 - 上游主题：[BITJEBE/nezha-BITJEBE](https://github.com/BITJEBE/nezha-BITJEBE)，作者 [BITJEBE](https://github.com/BITJEBE)
-- 监控项目：[Komari Monitor](https://github.com/nuomiiiii/komari)
-- 项目维护：[nuomiiiii](https://github.com/nuomiiiii)
+- 项目维护：[DemoAlbum](https://github.com/DemoAlbum)
 
 ## 许可证
 
