@@ -246,7 +246,7 @@ function CpuChart({
                 isAnimationActive={false}
                 content={
                   <ChartTooltipContent
-                    indicator="line"
+                    indicator="dot"
                     labelKey="timeStamp"
                     labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
                     formatter={(value) => (
@@ -338,7 +338,9 @@ function ProcessChart({
     },
   } satisfies ChartConfig
 
-  const chartData = historyData ? historyData.map((p) => ({ timeStamp: p.created_at.toString(), process: p.value })) : processChartData
+  const chartData = historyData
+    ? historyData.map((p) => ({ timeStamp: p.created_at.toString(), process: Math.round(p.value) }))
+    : processChartData
 
   return (
     <Card
@@ -374,18 +376,18 @@ function ProcessChart({
                 interval="preserveStartEnd"
                 tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
-              <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} />
+              <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} tickFormatter={(value) => `${Math.round(value)}`} />
               <ChartTooltip
                 isAnimationActive={false}
                 content={
                   <ChartTooltipContent
-                    indicator="line"
+                    indicator="dot"
                     labelKey="timeStamp"
                     labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
                     formatter={(value) => (
                       <div className="flex flex-1 items-center justify-between leading-none">
                         <span className="text-muted-foreground">{t("serverDetailChart.process")}</span>
-                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value)}</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Math.round(Number(value))}</span>
                       </div>
                     )}
                   />
@@ -712,7 +714,7 @@ function DiskChart({
                 isAnimationActive={false}
                 content={
                   <ChartTooltipContent
-                    indicator="line"
+                    indicator="dot"
                     labelKey="timeStamp"
                     labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
                     formatter={(value) => (
@@ -994,8 +996,8 @@ function ConnectChart({
     historyTcp && historyUdp
       ? historyTcp.map((p, i) => ({
           timeStamp: p.created_at.toString(),
-          tcp: p.value,
-          udp: historyUdp[i] ? historyUdp[i].value : 0,
+          tcp: Math.round(p.value),
+          udp: historyUdp[i] ? Math.round(historyUdp[i].value) : 0,
         }))
       : connectChartData
 
@@ -1045,7 +1047,15 @@ function ConnectChart({
                 interval="preserveStartEnd"
                 tickFormatter={(value) => (historyTcp ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
-              <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} type="number" interval="preserveStartEnd" />
+              <YAxis
+                tickLine={false}
+                axisLine={false}
+                mirror={true}
+                tickMargin={-15}
+                type="number"
+                interval="preserveStartEnd"
+                tickFormatter={(value) => `${Math.round(value)}`}
+              />
               <ChartTooltip
                 isAnimationActive={false}
                 content={
@@ -1056,7 +1066,7 @@ function ConnectChart({
                     formatter={(value, name) => (
                       <div className="flex flex-1 items-center justify-between leading-none">
                         <span className="text-muted-foreground">{name === "tcp" ? "TCP" : "UDP"}</span>
-                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value)}</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Math.round(Number(value))}</span>
                       </div>
                     )}
                   />
