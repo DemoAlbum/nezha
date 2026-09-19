@@ -58,6 +58,18 @@ const TIME_OPTIONS = [
   { value: "720", label: "30d" },
 ]
 
+// mbps 传入值的单位固定为 MB/s，按大小自动换算成 K/M/G，跟顶部实时速率标签的换算逻辑保持一致
+function formatSpeed(mbps: number): string {
+  if (mbps >= 1024) {
+    return `${(mbps / 1024).toFixed(2)}G/s`
+  }
+  if (mbps >= 1) {
+    return `${mbps.toFixed(2)}M/s`
+  }
+  return `${(mbps * 1024).toFixed(2)}K/s`
+}
+
+
 export default function ServerDetailChart({ server_id }: { server_id: number }) {
   const { lastMessage, connected, messageHistory } = useWebSocketContext()
   const [hours, setHours] = useState(0)
@@ -215,7 +227,7 @@ function CpuChart({
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="text-md font-medium">CPU</p>
+            <p className="text-md font-medium text-muted-foreground">CPU</p>
             <section className="flex items-center gap-2">
               <p className="text-xs text-end w-10 font-medium">{cpu.toFixed(2)}%</p>
               <AnimatedCircularProgressBar className="size-3 text-[0px]" max={100} min={0} value={cpu} primaryColor="hsl(var(--chart-1))" />
@@ -351,7 +363,7 @@ function ProcessChart({
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="text-md font-medium">{t("serverDetailChart.process")}</p>
+            <p className="text-md font-medium text-muted-foreground">{t("serverDetailChart.process")}</p>
             <section className="flex items-center gap-2">
               <p className="text-xs text-end w-10 font-medium">{process}</p>
             </section>
@@ -678,7 +690,7 @@ function DiskChart({
       <CardContent className="px-6 py-3">
         <section className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <p className="text-md font-medium">{t("serverDetailChart.disk")}</p>
+            <p className="text-md font-medium text-muted-foreground">{t("serverDetailChart.disk")}</p>
             <section className="flex flex-col items-end gap-0.5">
               <section className="flex items-center gap-2">
                 <p className="text-xs text-end w-10 font-medium">{disk.toFixed(0)}%</p>
@@ -886,7 +898,7 @@ function NetworkChart({
                 minTickGap={50}
                 interval="preserveStartEnd"
                 domain={[1, maxDownload]}
-                tickFormatter={(value) => `${value.toFixed(0)}M/s`}
+                tickFormatter={(value) => formatSpeed(value)}
               />
               <ChartTooltip
                 isAnimationActive={false}
@@ -900,7 +912,7 @@ function NetworkChart({
                         <span className="text-muted-foreground">
                           {name === "upload" ? t("serverDetailChart.upload") : t("serverDetailChart.download")}
                         </span>
-                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value).toFixed(2)}M/s</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{formatSpeed(Number(value))}</span>
                       </div>
                     )}
                   />
