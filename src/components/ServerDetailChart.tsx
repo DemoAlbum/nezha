@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { ChartConfig, ChartContainer } from "@/components/ui/chart"
+import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { useWebSocketContext } from "@/hooks/use-websocket-context"
 import { formatBytes } from "@/lib/format"
 import { fetchResourceMetrics, ResourcePoint } from "@/lib/nezha-api"
@@ -242,6 +242,22 @@ function CpuChart({
                 tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">CPU</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value).toFixed(2)}%</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Area isAnimationActive={false} dataKey="cpu" type="step" fill="hsl(var(--chart-1))" fillOpacity={0.3} stroke="hsl(var(--chart-1))" />
             </AreaChart>
           </ChartContainer>
@@ -359,6 +375,22 @@ function ProcessChart({
                 tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">{t("serverDetailChart.process")}</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value)}</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Area
                 isAnimationActive={false}
                 dataKey="process"
@@ -522,6 +554,24 @@ function MemChart({
                 tickFormatter={(value) => (historyMem ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value, name) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">
+                          {name === "mem" ? t("serverDetailChart.mem") : t("serverDetailChart.swap")}
+                        </span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value).toFixed(2)}%</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Area isAnimationActive={false} dataKey="mem" type="step" fill="hsl(var(--chart-8))" fillOpacity={0.3} stroke="hsl(var(--chart-8))" />
               <Area
                 isAnimationActive={false}
@@ -658,6 +708,22 @@ function DiskChart({
                 tickFormatter={(value) => (historyData ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">{t("serverDetailChart.disk")}</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value).toFixed(2)}%</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Area isAnimationActive={false} dataKey="disk" type="step" fill="hsl(var(--chart-5))" fillOpacity={0.3} stroke="hsl(var(--chart-5))" />
             </AreaChart>
           </ChartContainer>
@@ -820,6 +886,24 @@ function NetworkChart({
                 domain={[1, maxDownload]}
                 tickFormatter={(value) => `${value.toFixed(0)}M/s`}
               />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value, name) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">
+                          {name === "upload" ? t("serverDetailChart.upload") : t("serverDetailChart.download")}
+                        </span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value).toFixed(2)}M/s</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Line isAnimationActive={false} dataKey="upload" type="linear" stroke="hsl(var(--chart-1))" strokeWidth={1} dot={false} />
               <Line isAnimationActive={false} dataKey="download" type="linear" stroke="hsl(var(--chart-4))" strokeWidth={1} dot={false} />
             </LineChart>
@@ -962,6 +1046,22 @@ function ConnectChart({
                 tickFormatter={(value) => (historyTcp ? formatTime(Number(value)) : formatRelativeTime(value))}
               />
               <YAxis tickLine={false} axisLine={false} mirror={true} tickMargin={-15} type="number" interval="preserveStartEnd" />
+              <ChartTooltip
+                isAnimationActive={false}
+                content={
+                  <ChartTooltipContent
+                    indicator="line"
+                    labelKey="timeStamp"
+                    labelFormatter={(_, payload) => formatTime(Number(payload[0]?.payload?.timeStamp))}
+                    formatter={(value, name) => (
+                      <div className="flex flex-1 items-center justify-between leading-none">
+                        <span className="text-muted-foreground">{name === "tcp" ? "TCP" : "UDP"}</span>
+                        <span className="ml-2 font-medium text-foreground tabular-nums">{Number(value)}</span>
+                      </div>
+                    )}
+                  />
+                }
+              />
               <Line isAnimationActive={false} dataKey="tcp" type="linear" stroke="hsl(var(--chart-1))" strokeWidth={1} dot={false} />
               <Line isAnimationActive={false} dataKey="udp" type="linear" stroke="hsl(var(--chart-4))" strokeWidth={1} dot={false} />
             </LineChart>
