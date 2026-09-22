@@ -4,7 +4,7 @@ import ServerUsageBar from "@/components/ServerUsageBar"
 import TrafficBar from "@/components/TrafficBar"
 import { formatBytes } from "@/lib/format"
 import type { HomeLatencySummary } from "@/lib/home-latency"
-import { GetFontLogoClass, GetOsName, MageMicrosoftWindows } from "@/lib/logo-class"
+import { GetOsName, OsIcon } from "@/lib/logo-class"
 import { cn, calcTrafficUsed, formatNezhaInfo, parsePublicNote } from "@/lib/utils"
 import { NezhaServer } from "@/types/nezha-api"
 import { useTranslation } from "react-i18next"
@@ -67,12 +67,8 @@ export default function ServerCardInline({
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <section className={cn("grid grid-cols-9 items-center gap-3 flex-1")}>
             <div className={"items-center flex flex-row gap-2 whitespace-nowrap"}>
-              <div className="text-xs font-semibold">
-                {platform.includes("Windows") ? (
-                  <MageMicrosoftWindows className="size-[10px]" />
-                ) : (
-                  <p className={`fl-${GetFontLogoClass(platform)}`} />
-                )}
+              <div className="flex shrink-0 items-center justify-center">
+                <OsIcon platform={platform} className="size-5 shrink-0" />
               </div>
               <div className={"flex w-14 flex-col"}>
                 <p className="text-xs text-muted-foreground">{t("serverCard.system")}</p>
