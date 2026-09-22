@@ -1,4 +1,7 @@
 import type { SVGProps } from "react"
+import { useState } from "react"
+
+import { cn } from "@/lib/utils"
 
 export function GetFontLogoClass(platform: string): string {
   const p = (platform || "").toLowerCase().trim()
@@ -163,5 +166,43 @@ export function MageMicrosoftWindows(props: SVGProps<SVGSVGElement>) {
         d="M2.75 7.189V2.865c0-.102 0-.115.115-.115h8.622c.128 0 .14 0 .14.128V11.5c0 .128 0 .128-.14.128H2.865c-.102 0-.115 0-.115-.116zM7.189 21.25H2.865c-.102 0-.115 0-.115-.116V12.59c0-.128 0-.128.128-.128h8.635c.102 0 .115 0 .115.115v8.57c0 .09 0 .103-.116.103zM21.25 7.189v4.31c0 .116 0 .116-.116.116h-8.557c-.102 0-.128 0-.128-.115V2.865c0-.09 0-.102.115-.102h8.48c.206 0 .206 0 .206.205zm-8.763 9.661v-4.273c0-.09 0-.115.103-.09h8.621c.026 0 0 .09 0 .142v8.518a.06.06 0 0 1-.017.06a.06.06 0 0 1-.06.017H12.54s-.09 0-.077-.09V16.85z"
       ></path>
     </svg>
+  )
+}
+
+// font-logos 的 class 名和 simple-icons 的 slug 大部分一致，这里只列出不一致的少数几个
+const SIMPLE_ICONS_SLUG_OVERRIDES: Record<string, string> = {
+  "kali-linux": "kalilinux",
+  "raspberry-pi": "raspberrypi",
+  "rocky-linux": "rockylinux",
+  "gnu-guix": "gnu",
+  "pop-os": "popos",
+  tux: "linux",
+}
+
+// 返回 simple-icons（品牌官方配色的 SVG 图标 CDN）对应的 slug
+export function GetOsIconSlug(platform: string): string {
+  const p = (platform || "").toLowerCase().trim()
+  if (p.includes("windows") || p.startsWith("win")) return "windows11"
+  const flClass = GetFontLogoClass(platform)
+  return SIMPLE_ICONS_SLUG_OVERRIDES[flClass] || flClass
+}
+
+// 彩色系统图标：优先用 simple-icons 的官方配色 SVG，加载失败时自动回退到 font-logos 的单色字体图标
+export function OsIcon({ platform, className }: { platform: string; className?: string }) {
+  const [failed, setFailed] = useState(false)
+
+  if (failed) {
+    return <p className={cn(`fl-${GetFontLogoClass(platform)}`, className)} />
+  }
+
+  return (
+    <img
+      src={`https://cdn.simpleicons.org/${GetOsIconSlug(platform)}`}
+      alt=""
+      loading="lazy"
+      draggable={false}
+      className={cn("inline-block object-contain", className)}
+      onError={() => setFailed(true)}
+    />
   )
 }
