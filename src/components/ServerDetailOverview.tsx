@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { useWebSocketContext } from "@/hooks/use-websocket-context"
 import { formatBytes } from "@/lib/format"
+import { OsIcon } from "@/lib/logo-class"
 import { cn, formatNezhaInfo } from "@/lib/utils"
 import { NezhaWebsocketResponse } from "@/types/nezha-api"
 import countries from "i18n-iso-countries"
@@ -196,9 +197,11 @@ export default function ServerDetailOverview({ server_id }: { server_id: number 
             <CardContent className="px-1.5 py-1">
               <section className="flex flex-col items-start gap-0.5">
                 <p className="text-xs text-muted-foreground">{t("serverDetail.system")}</p>
-                <div className="text-xs">
-                  {" "}
-                  {platform} {platform_version ? " - " + platform_version : ""}
+                <div className="flex items-center gap-1.5 text-xs">
+                  <OsIcon platform={platform} className="size-4 shrink-0" />
+                  <span>
+                    {platform} {platform_version ? " - " + platform_version : ""}
+                  </span>
                 </div>
               </section>
             </CardContent>
