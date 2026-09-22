@@ -4,7 +4,7 @@ import ServerUsageBar from "@/components/ServerUsageBar"
 import TrafficBar from "@/components/TrafficBar"
 import { formatBytes } from "@/lib/format"
 import type { HomeLatencySummary } from "@/lib/home-latency"
-import { GetFontLogoClass, GetOsName, MageMicrosoftWindows } from "@/lib/logo-class"
+import { GetOsName, OsIcon } from "@/lib/logo-class"
 import { cn, calcTrafficUsed, formatNezhaInfo, parsePublicNote } from "@/lib/utils"
 import { NezhaServer } from "@/types/nezha-api"
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid"
@@ -134,11 +134,19 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
               </p>
             </div>
           </div>
-          {!online && (
-            <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
-              已离线
-            </span>
-          )}
+          <div className="flex shrink-0 items-center gap-2">
+            {!online && (
+              <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                已离线
+              </span>
+            )}
+            {platform && (
+              <div className="flex shrink-0 items-center gap-1.5">
+                <OsIcon platform={platform} className="size-4 shrink-0" />
+                <span className="whitespace-nowrap text-[11px] font-medium text-muted-foreground">{systemName}</span>
+              </div>
+            )}
+          </div>
         </section>
 
         {online && (
@@ -278,12 +286,8 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
         >
           {fixedTopServerName && (
             <div className={"hidden col-span-1 items-center lg:flex lg:flex-row gap-2"}>
-              <div className="text-xs font-semibold">
-                {platform.includes("Windows") ? (
-                  <MageMicrosoftWindows className="size-[10px]" />
-                ) : (
-                  <p className={`fl-${GetFontLogoClass(platform)}`} />
-                )}
+              <div className="flex shrink-0 items-center justify-center">
+                <OsIcon platform={platform} className="size-5 shrink-0" />
               </div>
               <div className={"flex w-14 flex-col"}>
                 <p className="text-xs text-muted-foreground">{t("serverCard.system")}</p>
