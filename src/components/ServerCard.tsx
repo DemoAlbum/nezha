@@ -81,6 +81,7 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
     net_out_transfer,
     public_note,
     platform,
+    arch,
     traffic_limit,
     traffic_limit_type,
     traffic_reset_day,
@@ -116,8 +117,8 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
         })}
         onClick={cardClick}
       >
-        <section className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-0.5 border-b border-border/70 pb-1.5">
-          <div className="flex shrink-0 items-center gap-2">
+        <section className="flex w-full items-center justify-between gap-3 border-b border-border/70 pb-1.5">
+          <div className="flex min-w-0 shrink items-center gap-2">
             <span
               className={cn(
                 "h-2 w-2 shrink-0 rounded-full",
@@ -125,22 +126,18 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
               )}
             />
             {showFlag ? <ServerFlag className="shrink-0 text-[14px] leading-none" country_code={country_code} /> : null}
+            <p className="truncate text-xs font-bold tracking-tight">{name}</p>
           </div>
-          <div className="min-w-0">
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <p className="truncate text-xs font-bold tracking-tight">{name}</p>
-              <div className="flex shrink-0 items-center gap-2">
-                {!online && (
-                  <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
-                    已离线
-                  </span>
-                )}
-                {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
-              </div>
-            </div>
-            <p className="truncate text-[10px] text-muted-foreground">
-              {systemName} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : "已离线"}
-            </p>
+          <div className="flex min-w-0 shrink items-center gap-2">
+            {!online && (
+              <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                已离线
+              </span>
+            )}
+            <span className="min-w-0 truncate text-[10px] text-muted-foreground">
+              {online ? `${t("serverCard.uptime")} ${uptimeValue}` : "已离线"} · {arch || "--"} · {systemName}
+            </span>
+            {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
           </div>
         </section>
 
