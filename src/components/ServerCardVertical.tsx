@@ -129,8 +129,7 @@ export default function ServerCardVertical({
             </span>
           )}
           <span className="min-w-0 truncate text-[11px] text-muted-foreground">
-            {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
-            {` · ${systemName}`}
+            {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")} · {systemName}
           </span>
           <OsIcon platform={platform} className="size-4 shrink-0" />
         </div>
