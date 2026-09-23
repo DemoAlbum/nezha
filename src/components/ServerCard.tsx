@@ -261,7 +261,10 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
           {showFlag ? <ServerFlag country_code={country_code} /> : null}
         </div>
         <div className="relative flex flex-col">
-          <p className={cn("break-normal font-bold tracking-tight", showFlag ? "text-xs " : "text-sm")}>{name}</p>
+          <p className={cn("flex items-center gap-1 break-normal font-bold tracking-tight", showFlag ? "text-xs " : "text-sm")}>
+            {fixedLeftServerName && platform && <OsIcon platform={platform} className="size-3.5 shrink-0" />}
+            {name}
+          </p>
           <div
             className={cn("hidden lg:block", {
               "lg:hidden": fixedTopServerName,
