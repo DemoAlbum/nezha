@@ -117,26 +117,24 @@ export default function ServerCardVertical({
       data-card-layout="vertical"
       onClick={cardClick}
     >
-      <section className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2.5 gap-y-0.5">
-        <div className="flex shrink-0 items-center gap-2.5">
+      <section className="flex min-w-0 items-center justify-between gap-2.5">
+        <div className="flex min-w-0 shrink items-center gap-2.5">
           <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", online ? "bg-emerald-500" : "bg-red-500")} />
           <ServerFlag className="shrink-0 text-[15px] leading-none" country_code={country_code} />
+          <p className="truncate text-base font-bold tracking-tight">{name}</p>
         </div>
-        <div className="min-w-0">
-          <div className="flex min-w-0 items-center justify-between gap-2">
-            <p className="truncate text-base font-bold tracking-tight">{name}</p>
-            <div className="flex shrink-0 items-center gap-2">
-              {!online && (
-                <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
-                  {t("offline")}
-                </span>
-              )}
-              <OsIcon platform={platform} className="size-4 shrink-0" />
-            </div>
-          </div>
-          <p className="truncate text-[11px] text-muted-foreground">
-            {systemName} · {arch || "--"} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
-          </p>
+        <div className="flex min-w-0 shrink items-center gap-2">
+          {!online && (
+            <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
+              {t("offline")}
+            </span>
+          )}
+          <span className="min-w-0 truncate text-[11px] text-muted-foreground">
+            {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
+            {arch && <span className="hidden sm:inline">{` · ${arch}`}</span>}
+            {` · ${systemName}`}
+          </span>
+          <OsIcon platform={platform} className="size-4 shrink-0" />
         </div>
       </section>
 
