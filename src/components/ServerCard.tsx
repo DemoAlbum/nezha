@@ -111,36 +111,36 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
 
     return (
       <Card
-        className={cn("flex cursor-pointer flex-col px-3.5 py-3 transition-colors hover:bg-accent/50", {
+        className={cn("flex cursor-pointer flex-col px-3.5 pt-3.5 pb-3 transition-colors hover:bg-accent/50", {
           "bg-card/70": customBackgroundImage,
         })}
         onClick={cardClick}
       >
-        <section className="flex w-full items-start justify-between gap-3 border-b border-border/70 pb-1.5">
-          <div className="grid min-w-0 items-center gap-x-3 [grid-template-columns:auto_minmax(0,1fr)]">
-            <div className="flex shrink-0 items-center gap-2">
-              <span
-                className={cn(
-                  "h-2 w-2 shrink-0 rounded-full",
-                  online ? "bg-green-500" : "bg-red-500",
-                )}
-              />
-              {showFlag ? <ServerFlag className="text-[14px] leading-none" country_code={country_code} /> : null}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-bold tracking-tight">{name}</p>
-              <p className="truncate text-[10px] text-muted-foreground">
-                {systemName} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : "已离线"}
-              </p>
-            </div>
-          </div>
+        <section className="grid w-full grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-0.5 border-b border-border/70 pb-1.5">
           <div className="flex shrink-0 items-center gap-2">
-            {!online && (
-              <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
-                已离线
-              </span>
-            )}
-            {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
+            <span
+              className={cn(
+                "h-2 w-2 shrink-0 rounded-full",
+                online ? "bg-green-500" : "bg-red-500",
+              )}
+            />
+            {showFlag ? <ServerFlag className="shrink-0 text-[14px] leading-none" country_code={country_code} /> : null}
+          </div>
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center justify-between gap-2">
+              <p className="truncate text-xs font-bold tracking-tight">{name}</p>
+              <div className="flex shrink-0 items-center gap-2">
+                {!online && (
+                  <span className="shrink-0 rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                    已离线
+                  </span>
+                )}
+                {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
+              </div>
+            </div>
+            <p className="truncate text-[10px] text-muted-foreground">
+              {systemName} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : "已离线"}
+            </p>
           </div>
         </section>
 
