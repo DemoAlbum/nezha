@@ -140,12 +140,7 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
                 已离线
               </span>
             )}
-            {platform && (
-              <div className="flex shrink-0 items-center gap-1.5">
-                <OsIcon platform={platform} className="size-4 shrink-0" />
-                <span className="whitespace-nowrap text-[11px] font-medium text-muted-foreground">{systemName}</span>
-              </div>
-            )}
+            {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
           </div>
         </section>
 
@@ -260,10 +255,16 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
         <div className={cn("flex items-center justify-center", showFlag ? "min-w-[17px]" : "min-w-0")}>
           {showFlag ? <ServerFlag country_code={country_code} /> : null}
         </div>
-        <div className="relative flex flex-col">
-          <p className={cn("flex items-center gap-1 break-normal font-bold tracking-tight", showFlag ? "text-xs " : "text-sm")}>
+        <div className="relative flex min-w-0 flex-col">
+          <p
+            className={cn(
+              "flex items-center gap-1 font-bold tracking-tight",
+              showFlag ? "text-xs " : "text-sm",
+              fixedLeftServerName ? "min-w-0" : "break-normal",
+            )}
+          >
             {fixedLeftServerName && platform && <OsIcon platform={platform} className="size-3.5 shrink-0" />}
-            {name}
+            <span className={cn(fixedLeftServerName && "truncate")}>{name}</span>
           </p>
           <div
             className={cn("hidden lg:block", {
