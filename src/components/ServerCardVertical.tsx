@@ -117,23 +117,25 @@ export default function ServerCardVertical({
       data-card-layout="vertical"
       onClick={cardClick}
     >
-      <section className="flex min-w-0 items-center gap-2.5">
-        <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", online ? "bg-emerald-500" : "bg-red-500")} />
-        <ServerFlag className="shrink-0 text-[15px] leading-none" country_code={country_code} />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-base font-bold tracking-tight">{name}</p>
-          <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground">
-            <OsIcon platform={platform} className="size-3 shrink-0" />
-            <span className="truncate">
+      <section className="flex min-w-0 items-start justify-between gap-2.5">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", online ? "bg-emerald-500" : "bg-red-500")} />
+          <ServerFlag className="shrink-0 text-[15px] leading-none" country_code={country_code} />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-base font-bold tracking-tight">{name}</p>
+            <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
               {systemName} · {arch || "--"} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
-            </span>
-          </p>
+            </p>
+          </div>
         </div>
-        {!online && (
-          <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
-            {t("offline")}
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          <OsIcon platform={platform} className="size-4 shrink-0" />
+          {!online && (
+            <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-[10px] font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-300">
+              {t("offline")}
+            </span>
+          )}
+        </div>
       </section>
 
       <div className="my-1.5 border-t border-border/70" />
