@@ -114,7 +114,8 @@ test("keeps the vertical card on a compact spacing rhythm", () => {
 
 test("keeps the header dot, flag, name, and OS icon on one dynamically-spaced line", () => {
   assert.match(verticalCard, /flex min-w-0 items-center justify-between gap-2\.5/)
-  assert.match(verticalCard, /serverCard\.uptime[\s\S]*uptimeValue[\s\S]*hidden sm:inline[\s\S]*systemName/)
+  assert.match(verticalCard, /serverCard\.uptime[\s\S]*uptimeValue[\s\S]*systemName/)
+  assert.doesNotMatch(verticalCard, /arch/)
   assert.doesNotMatch(verticalCard, /mt-1\.5 h-2\.5/)
   assert.doesNotMatch(verticalCard, /ServerFlag className="mt-/)
 })
