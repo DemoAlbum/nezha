@@ -89,7 +89,6 @@ export default function ServerCardVertical({
     net_out_transfer,
     public_note,
     platform,
-    arch,
     traffic_limit,
     traffic_limit_type,
     traffic_reset_day,
@@ -131,7 +130,6 @@ export default function ServerCardVertical({
           )}
           <span className="min-w-0 truncate text-[11px] text-muted-foreground">
             {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
-            {arch && <span className="hidden sm:inline">{` · ${arch}`}</span>}
             {` · ${systemName}`}
           </span>
           <OsIcon platform={platform} className="size-4 shrink-0" />
