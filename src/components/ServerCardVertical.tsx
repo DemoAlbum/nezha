@@ -7,7 +7,7 @@ import BillingInfo from "@/components/billingInfo"
 import { Card } from "@/components/ui/card"
 import { formatBytes } from "@/lib/format"
 import type { HomeLatencySummary } from "@/lib/home-latency"
-import { GetOsName } from "@/lib/logo-class"
+import { GetOsName, OsIcon } from "@/lib/logo-class"
 import { calcTrafficUsed, cn, formatNezhaInfo, parsePublicNote } from "@/lib/utils"
 import type { NezhaServer } from "@/types/nezha-api"
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/20/solid"
@@ -122,8 +122,11 @@ export default function ServerCardVertical({
         <ServerFlag className="shrink-0 text-[15px] leading-none" country_code={country_code} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-base font-bold tracking-tight">{name}</p>
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-            {systemName} · {arch || "--"} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
+          <p className="mt-0.5 flex min-w-0 items-center gap-1 text-[11px] text-muted-foreground">
+            <OsIcon platform={platform} className="size-3 shrink-0" />
+            <span className="truncate">
+              {systemName} · {arch || "--"} · {online ? `${t("serverCard.uptime")} ${uptimeValue}` : t("offline")}
+            </span>
           </p>
         </div>
         {!online && (
