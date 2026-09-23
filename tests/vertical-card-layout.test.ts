@@ -112,9 +112,9 @@ test("keeps the vertical card on a compact spacing rhythm", () => {
   assert.doesNotMatch(verticalCard, /sm:p-5/)
 })
 
-test("aligns the header icons with the name row via a shared grid column", () => {
-  assert.match(verticalCard, /grid-cols-\[auto_minmax\(0,1fr\)\]/)
-  assert.match(verticalCard, /items-start gap-x-2\.5 gap-y-0\.5/)
+test("keeps the header dot, flag, name, and OS icon on one dynamically-spaced line", () => {
+  assert.match(verticalCard, /flex min-w-0 items-center justify-between gap-2\.5/)
+  assert.match(verticalCard, /serverCard\.uptime[\s\S]*uptimeValue[\s\S]*hidden sm:inline[\s\S]*systemName/)
   assert.doesNotMatch(verticalCard, /mt-1\.5 h-2\.5/)
   assert.doesNotMatch(verticalCard, /ServerFlag className="mt-/)
 })
