@@ -112,8 +112,9 @@ test("keeps the vertical card on a compact spacing rhythm", () => {
   assert.doesNotMatch(verticalCard, /sm:p-5/)
 })
 
-test("centers the header icons with the two-line identity block", () => {
-  assert.match(verticalCard, /flex min-w-0 items-center gap-2\.5/)
+test("aligns the header icons with the name row via a shared grid column", () => {
+  assert.match(verticalCard, /grid-cols-\[auto_minmax\(0,1fr\)\]/)
+  assert.match(verticalCard, /items-start gap-x-2\.5 gap-y-0\.5/)
   assert.doesNotMatch(verticalCard, /mt-1\.5 h-2\.5/)
   assert.doesNotMatch(verticalCard, /ServerFlag className="mt-/)
 })
@@ -138,7 +139,7 @@ test("matches the default card billing and transfer details to the vertical card
   assert.match(defaultBranch, /min-w-0 first:border-r first:border-border\/70/)
   assert.doesNotMatch(defaultBranch, /min-w-0 px-1 first:border-r|md:px-5/)
   assert.match(defaultBranch, /whitespace-nowrap text-\[11px\] tabular-nums text-muted-foreground/)
-  assert.match(defaultBranch, /flex cursor-pointer flex-col px-3\.5 py-3/)
+  assert.match(defaultBranch, /flex cursor-pointer flex-col px-3\.5 pt-3\.5 pb-3/)
   assert.match(defaultBranch, /border-b border-border\/70 pb-1\.5/)
   assert.match(defaultBranch, /flex w-full min-w-0 flex-col pt-1\.5/)
   assert.match(defaultBranch, /mt-1\.5[\s\S]*<ServerLatencySummary/)
