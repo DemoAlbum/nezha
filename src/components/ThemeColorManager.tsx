@@ -8,7 +8,7 @@ export function ThemeColorManager() {
 
   useEffect(() => {
     const updateThemeColor = () => {
-      const currentTheme = theme
+      const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
       const meta = document.querySelector('meta[name="theme-color"]')
 
       if (!meta) {
@@ -18,7 +18,7 @@ export function ThemeColorManager() {
       }
 
       const themeColor =
-        currentTheme === "dark"
+        isDark
           ? "hsl(30 15% 8%)" // 深色模式背景色
           : "hsl(0 0% 98%)" // 浅色模式背景色
 
