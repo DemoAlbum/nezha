@@ -135,7 +135,7 @@ export default function ServerCard({ now, serverInfo, latencySummary }: { now: n
               </span>
             )}
             <span className="min-w-0 truncate text-[10px] text-muted-foreground">
-              {online ? `${t("serverCard.uptime")} ${uptimeValue}` : "已离线"} · {arch || "--"} · {systemName}
+              {online ? `${t("serverCard.uptime")} ${uptimeValue} · ` : ""}{arch || "--"} · {systemName}
             </span>
             {platform && <OsIcon platform={platform} className="size-4 shrink-0" />}
           </div>
