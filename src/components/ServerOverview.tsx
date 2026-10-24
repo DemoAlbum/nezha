@@ -37,7 +37,7 @@ export default function ServerOverview({ online, offline, total, up, down, upSpe
           onClick={() => {
             setStatus("all")
           }}
-          className={cn("hover:border-blue-500 cursor-pointer transition-all", {
+          className={cn("cursor-pointer hover:ring-blue-500 ring-1 ring-transparent transition-all", {
             "bg-card/70": customBackgroundImage,
           })}
         >
