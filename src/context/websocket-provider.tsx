@@ -42,6 +42,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     void updateData()
 
     const intervalId = window.setInterval(() => {
+      if (document.hidden) return
       void updateData()
     }, 2000)
 
