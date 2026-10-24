@@ -22,17 +22,17 @@
 
       :root {
         color-scheme: light;
-        --bg: #ffffff;
+        --bg: hsl(0 0% 98%);
       }
 
       html.dark {
         color-scheme: dark;
-        --bg: #242424;
+        --bg: hsl(30 15% 8%);
       }
 
       html.light {
         color-scheme: light;
-        --bg: #ffffff;
+        --bg: hsl(0 0% 98%);
       }
 
       html {
@@ -69,7 +69,7 @@
         const root = document.documentElement
 
         function updateThemeColor(isDark) {
-          const themeColor = isDark ? "#242424" : "#fafafa"
+          const themeColor = isDark ? "hsl(30 15% 8%)" : "hsl(0 0% 98%)"
           document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColor)
         }
 
